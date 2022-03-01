@@ -1,10 +1,6 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-"""
-Created on Fri Aug 23 16:15:59 2019
 
-@author: fujunhe
-"""
 from __future__ import division
 import random
 import math
@@ -585,7 +581,7 @@ def main(capacity_range):
         c_j.append(c_jj)
         r_j.append(r_jj)
         
-    lambdas = 1 / 10000
+    lambdas = 2 / 100000  # 1 / 10000
     mu = 1 / 1000
     #print((1/mu) / (1/mu + 1/lambdas))   #
     #print("sum(c_j) and c_j")
@@ -597,7 +593,9 @@ def main(capacity_range):
 
     delta_j = []
     for j in range(S):
-        delta_j.append(1 / random.uniform(10,100))
+        #delta_j.append(1 / random.uniform(10,100))
+        delta_j.append(1 / random.uniform(10,90))
+
         
     #print(delta_j)
     if sum(c_j) < F:
