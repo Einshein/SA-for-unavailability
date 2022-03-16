@@ -4,7 +4,7 @@ import time
 import io
 
 t0 = time.clock()
-trails=500
+trails=10
 reduced_una=[]
 max_una_bs=[]
 max_una_wl=[]
@@ -30,8 +30,8 @@ print(max_una_wl_ave)
 
 
 
-with io.open('result.txt','a', encoding='utf_8') as f:
-    f.write('delta^-1=90'.decode('utf8')+'\n')  # change it every time after changing the reletive value
-    f.write(str(reduced_una_ave).decode('utf8')+'\n')
-    f.write(str(max_una_bs_ave).decode('utf8')+'\n')
-    f.write(str(max_una_wl_ave).decode('utf8')+'\n')
+# with io.open('result.txt','a', encoding='utf_8') as f:
+#     f.write('delta^-1=90'.decode('utf8')+'\n')  # change it every time after changing the reletive value
+#     f.write(str(reduced_una_ave).decode('utf8')+'\n')
+#     f.write(str(max_una_bs_ave).decode('utf8')+'\n')
+#     f.write(str(max_una_wl_ave).decode('utf8')+'\n')
