@@ -572,7 +572,7 @@ def lambda_wl(omega):
 #if __name__ == "__main__":
 def main(capacity_range):
 #    costf(5, 3, 1 / 100, 1 / 10, 1 / 0.01, 2)
-    F = 100  #
+    F = 100  # change it default:100
     S = 20   #
     
     c_j = []
@@ -588,10 +588,10 @@ def main(capacity_range):
     #print((1/mu) / (1/mu + 1/lambdas))   #
     #print("sum(c_j) and c_j")
     #print(sum(c_j))
-    print("c_j:",c_j) 
+    #print("c_j:",c_j) 
     #print("sum(r_j) and r_j")
     #print(sum(r_j))
-    print("r_j",r_j)
+    #print("r_j",r_j)
 
     delta_j = []
     for j in range(S):
