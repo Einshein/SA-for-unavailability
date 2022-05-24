@@ -110,7 +110,9 @@ def sa(F, S, c_j, r_j, lambdas, mu, delta_j, costf, T_i, T_t, cool):
         
     T = T_i  # initial temp
     
+    #numberOfIterations=0
     while T > T_t:
+        #numberOfIterations=numberOfIterations+1
         T = cool*T       #temperature reduction
         
         allocation1 = []  # a new allocation
@@ -152,7 +154,7 @@ def sa(F, S, c_j, r_j, lambdas, mu, delta_j, costf, T_i, T_t, cool):
             results[0] = J
             results[1] = allocation
             #print(results)
-    
+    #print("numberOfIterations:",numberOfIterations)
     return results
             
 def costf_bs(c_jj, r_jj, lambdas, mu, delta_jj, L_jj):
@@ -570,21 +572,14 @@ def lambda_wl(omega):
 
 
 #if __name__ == "__main__":
-def main(capacity_range):
+def main(capacity_range): # change it in trials.py; default : 16
 #    costf(5, 3, 1 / 100, 1 / 10, 1 / 0.01, 2)
-    F = 100  # change it default:100
-    S = 20   #
+    F = 100  # change it; default:100
+    S = 20   # change it; default:20
     
-    c_j = []
-    r_j = []
-    for j in range(S):  #randomly set the list c_j and r_j
-        c_jj = random.randint(1,capacity_range)
-        r_jj = random.randint(1,c_jj)
-        c_j.append(c_jj)
-        r_j.append(r_jj)
-        
-    lambdas = 1 / 10000  # 1 / 10000
-    mu = 1 / 1000
+
+    lambdas = 1 / 10000  # change it; default:1 / 10000
+    mu = 1 / 1000  # change it; default:1 / 1000
     #print((1/mu) / (1/mu + 1/lambdas))   #
     #print("sum(c_j) and c_j")
     #print(sum(c_j))
@@ -592,49 +587,57 @@ def main(capacity_range):
     #print("sum(r_j) and r_j")
     #print(sum(r_j))
     #print("r_j",r_j)
-
     delta_j = []
     for j in range(S):
-        delta_j.append(1 / random.uniform(10,100))
+        delta_j.append(1 / random.uniform(10,100))    # change it; default:100
 
+    c_j = []
+    r_j = []
+    while True:
+        for j in range(S):  # randomly set the list c_j and r_j
+            c_jj = random.randint(1,capacity_range)
+            r_jj = random.randint(1,c_jj)
+            c_j.append(c_jj)
+            r_j.append(r_jj)
+        if sum(c_j) >= F: #  insure total protecion capacity >= number of functions
+            break
 
-        
     #print(delta_j)
-    if sum(c_j) < F:
-        J = (1/mu) / (1/mu + 1/lambdas)    # ? unavailability / failure probability(1-survivability)
-        return 0,0,0
+    # if sum(c_j) < F:
+    #     J = (1/mu) / (1/mu + 1/lambdas)    # ? unavailability / failure probability(1-survivability)
+    #     return 0,0,0
     # elif sum(c_j) == F:   #
     #     print("=====")      
-    else:
-        T_i = 10000000.0    #D_init
-        T_t = 0.00001       #D_term
-        cool = 0.99
-        #the optimal allocation J_ST under the static scenario
-        J_ST = sa(F, S, c_j, r_j, lambdas, mu, delta_j, costf_bs, T_i, T_t, cool) 
-        #print("The optimal allocation J_ST and its maximum unavailability under the static scenario:")
-        #print(J_ST)
 
-        #the optimal allocation J_WL under the workload-dependent scenario
-        #print("The optimal allocation J_WL and its maximum unavailability under the workload-dependent scenario:")
-        J_WL = sa(F, S, c_j, r_j, lambdas, mu, delta_j, costf_wl, T_i, T_t, cool)
-        #print(J_WL)
+    T_i = 10000000.0    #D_init
+    T_t = 0.00001       #D_term
+    cool = 0.998  #default:0.99
+    # the optimal allocation J_ST under the static scenario
+    J_ST = sa(F, S, c_j, r_j, lambdas, mu, delta_j, costf_bs, T_i, T_t, cool) 
+    # print("The optimal allocation J_ST and its maximum unavailability under the static scenario:")
+    # print(J_ST)
 
-        #Verify the maximum unavailability of the allocation J_ST under the workload-dependent scenario
-        Q=0 #maximum unavailability
-        for j in range(S):
-            q = costf_wl(c_j[j], r_j[j], lambdas, mu, delta_j[j], J_ST[1][j])
-            if q > Q:
-                Q = q
+    # the optimal allocation J_WL under the workload-dependent scenario
+    # print("The optimal allocation J_WL and its maximum unavailability under the workload-dependent scenario:")
+    J_WL = sa(F, S, c_j, r_j, lambdas, mu, delta_j, costf_wl, T_i, T_t, cool)
+    # print(J_WL)
 
-        #print("The maximum unavailability of the allocation J_ST under the workload-dependent scenario:")
-        #print(Q)
+    # Verify the maximum unavailability of the allocation J_ST under the workload-dependent scenario
+    Q=0 #maximum unavailability
+    for j in range(S):
+        q = costf_wl(c_j[j], r_j[j], lambdas, mu, delta_j[j], J_ST[1][j])
+        if q > Q:
+            Q = q
 
-        #reduce how many percent maximum unavailability compared to the baseline model
-        #print("How much has the maximum unavailability decreased compare to the baseline model")
-        adv=(Q-J_WL[0])/Q
-        #print(adv)
-        #return adv,Q,J_WL[0]
-        return adv,Q,J_WL[0]
+    # print("The maximum unavailability of the allocation J_ST under the workload-dependent scenario:")
+    # print(Q)
+
+    # reduce how many percent maximum unavailability compared to the baseline model
+    # print("How much has the maximum unavailability decreased compare to the baseline model")
+    adv=(Q-J_WL[0])/Q
+    # print(adv)
+    # return adv,Q,J_WL[0]
+    return adv,Q,J_WL[0]
 
         
 

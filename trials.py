@@ -33,7 +33,7 @@ print(max_una_wl_ave)
 
 
 with io.open('result.txt','a', encoding='utf_8') as f:
-    f.write(''.decode('utf8')+'\n')  # change it every time after changing the reletive value
+    f.write('M=16'.decode('utf8')+'\n')  # change it every time after changing the reletive value for collecting data
     f.write(str(reduced_una_ave).decode('utf8')+'\n')
     f.write(str(max_una_bs_ave).decode('utf8')+'\n')
     f.write(str(max_una_wl_ave).decode('utf8')+'\n')

@@ -21,7 +21,7 @@ class MathTextSciFormatter(mtick.Formatter):
         else:
             s =  r'%s%s' % (significand, exponent)
         return "${}$".format(s)
-
+##########################################################
 
 #x = np.arange(14,19) 
 #variant: M
@@ -40,17 +40,22 @@ plt.plot(x, y2, marker='o', clip_on=False,label='Proposed model') # draw y2
 plt.gca().yaxis.set_major_formatter(MathTextSciFormatter("%1.1e"))
 plt.legend(fontsize=14)
 #plt.show()
+qq=[]
 q=[]
+
 for i in range(0,5):
-    q.append((y1[0]-y2[0])/y1[0])
+    q.append((y1[i]-y2[i])/y1[i])
+    qq.append((y1[i]-y2[i])/y1[i])
+
+print("ex1")
+print("y1",y1)
+print("y2",y2)
+print("reduced una",q)
 print(1,sum(q)/5)
 
-qq=[]
-for i in range(0,5):
-    qq.append((y1[0]-y2[0])/y1[0])
 
 
-
+####################################
 
 #variant: lambda
 x = [2 / 100000, 4 / 100000, 6 / 100000, 8 / 100000, 1 / 10000]
@@ -78,12 +83,16 @@ plt.legend(fontsize=14)
 #plt.show()
 q=[]
 for i in range(0,5):
-    q.append((y1[0]-y2[0])/y1[0])
+    q.append((y1[i]-y2[i])/y1[i])
+    qq.append((y1[i]-y2[i])/y1[i])
+
+print("ex2")
+print("y1",y1)
+print("y2",y2)
+print("reduced una",q)
 print(2,sum(q)/5)
-for i in range(0,5):
-    qq.append((y1[0]-y2[0])/y1[0])
 
-
+###########################################################
 
 #variant: mu
 x = [2 / 10000, 4 / 10000, 6 / 10000, 8 / 10000, 1 / 1000]
@@ -110,12 +119,16 @@ plt.legend(fontsize=14)
 #plt.show()
 q=[]
 for i in range(0,5):
-    q.append((y1[0]-y2[0])/y1[0])
-print(3,sum(q)/5)
-for i in range(0,5):
-    qq.append((y1[0]-y2[0])/y1[0])
+    q.append((y1[i]-y2[i])/y1[i])
+    qq.append((y1[i]-y2[i])/y1[i])
 
+print("ex3")
+print("y1",y1)
+print("y2",y2)
+print("reduced una",q)
+print(1,sum(q)/5)
 
+###########################################################################
 
 #variant: Upper bound of recovery time U
 x = [80, 90, 100, 110, 120]
@@ -136,13 +149,86 @@ plt.plot(x, y2, marker='o', clip_on=False,label='Proposed model')
 plt.gca().yaxis.set_major_formatter(MathTextSciFormatter("%1.1e"))
 
 plt.legend(fontsize=14)
-plt.show()
+#plt.show()
 q=[]
 for i in range(0,5):
-    q.append((y1[0]-y2[0])/y1[0])
-print(4,sum(q)/5)
+    q.append((y1[i]-y2[i])/y1[i])
+    qq.append((y1[i]-y2[i])/y1[i])
 
+print("ex4")
+print("y1",y1)
+print("y2",y2)
+print("reduced una",q)
+print(1,sum(q)/5)
+
+
+##########################################################################
+
+#variant: F
+x = [80, 90, 100, 110, 120]
+y1 = [0.019571763431755106, 0.020030179048672776, 0.02055638706548533, 0.020850540399078906, 0.021652756985563078]      # 曲线 y1
+y2 = [0.014928046132978164, 0.015558807597083703, 0.016145208369117085, 0.0169223145683277, 0.018403728122718375]    # 曲线 y2
+fig2 = plt.figure()    # 定义一个图像窗口
+ax = fig2.add_subplot(111) 
+ax.set(title='', ylabel='Maximum unavailability',xlabel='Number of functions, '+ r'|F|', xlim=[80, 120],xticks=[80, 90, 100, 110, 120]) 
+plt.ylabel(ylabel='Maximum unavailability', fontsize=16)
+plt.xlabel(xlabel='Number of functions, '+ r'$|F|$', fontsize=16)
+plt.tick_params(labelsize=16)
+
+ax.set_ylim(0.014,0.024)
+ax.set_yticks([0.014,0.016,0.018,0.02,0.022,0.024])
+# ax.yaxis.set_major_formatter(mtick.FormatStrFormatter('%.1e'))
+plt.plot(x, y1, marker='s', clip_on=False, label='Baseline model') 
+plt.plot(x, y2, marker='o', clip_on=False,label='Proposed model') 
+plt.gca().yaxis.set_major_formatter(MathTextSciFormatter("%1.1e"))
+
+plt.legend(fontsize=14)
+#plt.show()
+q=[]
 for i in range(0,5):
-    qq.append((y1[0]-y2[0])/y1[0])
-print("total:", sum(qq)/20)
+    q.append((y1[i]-y2[i])/y1[i])
+    qq.append((y1[i]-y2[i])/y1[i])
 
+print("ex5")
+print("y1",y1)
+print("y2",y2)
+print("reduced una",q)
+print(1,sum(q)/5)
+
+
+######################################################
+
+#variant: S, number of backup servers
+x = [16, 18, 20, 22, 24]
+y1 = [0.0212142575831, 0.02051891728774914, 0.02055638706548533, 0.0203690161117, 0.0204160075465]      # 曲线 y1
+y2 = [0.0178790306508, 0.016554155117337502, 0.016145208369117085, 0.0161170635111, 0.0162355979096]     # 曲线 y2
+fig1 = plt.figure()    # 
+ax = fig1.add_subplot(111) 
+ax.set(title='', ylabel='Maximum unavailability',xlabel='Number of backup servers, |S|',xlim=[16,24],xticks=[16,18,20,22,24]) 
+plt.ylabel(ylabel='Maximum unavailability', fontsize=16)
+plt.xlabel(xlabel='Number of backup servers, '+r'$|S|$', fontsize=16)
+plt.tick_params(labelsize=16)
+
+ax.set_ylim(0.016,0.022)
+ax.set_yticks([0.016,0.017,0.018,0.019,0.02,0.021,0.022])
+
+# ax.yaxis.set_major_formatter(mtick.FormatStrFormatter('%.1E'))
+plt.plot(x, y1, marker='s', clip_on=False, label='Baseline model') # draw y1
+plt.plot(x, y2, marker='o', clip_on=False,label='Proposed model') # draw y2
+plt.gca().yaxis.set_major_formatter(MathTextSciFormatter("%1.1e"))
+plt.legend(fontsize=14)
+#plt.show()
+q=[]
+for i in range(0,5):
+    q.append((y1[i]-y2[i])/y1[i])
+    qq.append((y1[i]-y2[i])/y1[i])
+
+print("ex6")
+print("y1",y1)
+print("y2",y2)
+print("reduced una",q)
+print(1,sum(q)/5)
+
+print("total reduced una:", sum(qq)/30)
+
+plt.show()
