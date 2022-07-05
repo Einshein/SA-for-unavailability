@@ -26,11 +26,11 @@ class MathTextSciFormatter(mtick.Formatter):
 #x = np.arange(14,19) 
 #variant: M
 x = np.linspace(14, 18, 5)
-y1 = [0.02100215765799985, 0.020651076805796576, 0.02055638706548533, 0.020132600465071794, 0.019993571816002278]      # 曲线 y1
-y2 = [0.01735280235993259, 0.01665477081253022, 0.016145208369117085, 0.01584259324009574, 0.015536404712971706]     # 曲线 y2
+y1 = [0.020951277847667402, 0.020214279762985406, 0.019665077232690186, 0.0193478759459687, 0.019186880499269945]      # 曲线 y1
+y2 = [0.016240454380970833, 0.015010432324019125, 0.014005265003568385, 0.013412589310829184, 0.013062404717336818]     # 曲线 y2
 fig1 = plt.figure()    # 
 ax = fig1.add_subplot(111) 
-ax.set(title='', ylabel='Maximum unavailability',xlabel='Upper bound of protection capacity, M',xlim=[14,18],xticks=[14,15,16,17,18],ylim=[0.015,0.022]) 
+ax.set(title='', ylabel='Maximum unavailability',xlabel='Upper bound of protection capacity, M',xlim=[14,18],xticks=[14,15,16,17,18],ylim=[0.013,0.021]) 
 plt.ylabel(ylabel='Maximum unavailability', fontsize=16)
 plt.xlabel(xlabel='Upper bound of protection capacity, '+r'$M$', fontsize=16)
 plt.tick_params(labelsize=16)
@@ -59,8 +59,8 @@ print(1,sum(q)/5)
 
 #variant: lambda
 x = [2 / 100000, 4 / 100000, 6 / 100000, 8 / 100000, 1 / 10000]
-y1 = [0.0046627326345636474, 0.00896018065198039, 0.012938921128644611, 0.01672790605513416, 0.02055638706548533]      # 曲线 y1
-y2 = [0.0038372353225161367, 0.007231186448063089, 0.010263445250794551, 0.013152605421676648, 0.016145208369117085]     # 曲线 y2
+y1 = [0.004553046323036749, 0.008673950778759583, 0.01269623505211162, 0.01628806999145799, 0.019665077232690186]      # 曲线 y1
+y2 = [0.0033810333124260467, 0.006160534549073553, 0.00896875056231522, 0.011497322832565536, 0.014005265003568385]     # 曲线 y2
 fig2 = plt.figure()   
 ax = fig2.add_subplot(111) 
 ax.set(title='', ylabel='Maximum unavailability',xlabel='Average failure rate, '+ r'$\lambda$', xlim=[2 / 100000,1 / 10000], xticks=[2 / 100000, 4 / 100000, 6 / 100000, 8 / 100000, 1 / 10000]) 
@@ -96,8 +96,8 @@ print(2,sum(q)/5)
 
 #variant: mu
 x = [2 / 10000, 4 / 10000, 6 / 10000, 8 / 10000, 1 / 1000]
-y1 = [0.13941302736445854, 0.056527917010649416, 0.03345843369047702, 0.025344471377281214, 0.02055638706548533]      # 曲线 y1
-y2 = [0.12984885487566655, 0.04718883468663414, 0.026614833539103332, 0.02026312700840011, 0.016145208369117085]     # 曲线 y2
+y1 = [0.12572817084460117, 0.04946355449877604, 0.030125483177730318, 0.023065413160206452, 0.019665077232690186]      # 曲线 y1
+y2 = [0.10092528492221756, 0.030323883619878058, 0.01866052334821427, 0.014875131797331693, 0.014005265003568385]     # 曲线 y2
 fig2 = plt.figure()    
 ax = fig2.add_subplot(111) 
 ax.set(title='', ylabel='Maximum unavailability',xlabel='Average repair rate, '+ r'$\mu_h$', xlim=[2 / 10000,1 / 1000],xticks=[2 / 10000, 4 / 10000, 6 / 10000, 8 / 10000, 1 / 1000]) 
@@ -105,8 +105,8 @@ plt.ylabel(ylabel='Maximum unavailability', fontsize=16)
 plt.xlabel(xlabel='Average repair rate, '+ r'$\mu_h$', fontsize=16)
 plt.tick_params(labelsize=16)
 
-ax.set_ylim(0.01,0.15)
-ax.set_yticks([0.01,0.08,0.15])
+ax.set_ylim(0.01,0.13)
+ax.set_yticks([0.01,0.04,0.07,0.1,0.13])
 plt.xticks(rotation=45)
 # ax.yaxis.set_major_formatter(mtick.FormatStrFormatter('%.1E'))
 # ax.xaxis.set_major_formatter(mtick.FormatStrFormatter('%.1E'))
@@ -132,8 +132,8 @@ print(1,sum(q)/5)
 
 #variant: Upper bound of recovery time U
 x = [80, 90, 100, 110, 120]
-y1 = [0.019144567175345722, 0.019990717583343785, 0.02055638706548533, 0.022215407812363145, 0.023217181980719193]      # 曲线 y1
-y2 = [0.015452283833569138, 0.016165836680500333, 0.016145208369117085, 0.018593713555951526, 0.019194029703872077]    # 曲线 y2
+y1 = [0.01772628409910509, 0.018709670433119004, 0.019665077232690186, 0.020648659590137376, 0.02170472007951516]      # 曲线 y1
+y2 = [0.012351916990485066, 0.013176336982278115, 0.014005265003568385, 0.014948330703372353, 0.01584818559333616]    # 曲线 y2
 fig2 = plt.figure()    # 定义一个图像窗口
 ax = fig2.add_subplot(111) 
 ax.set(title='', ylabel='Maximum unavailability',xlabel='Upper bound of recovery time, '+ r'U', xlim=[80, 120],xticks=[80, 90, 100, 110, 120]) 
@@ -141,8 +141,8 @@ plt.ylabel(ylabel='Maximum unavailability', fontsize=16)
 plt.xlabel(xlabel='Upper bound of recovery time, '+ r'$U$', fontsize=16)
 plt.tick_params(labelsize=16)
 
-ax.set_ylim(0.014,0.024)
-ax.set_yticks([0.014,0.016,0.018,0.02,0.022,0.024])
+ax.set_ylim(0.012,0.022)
+ax.set_yticks([0.012,0.014,0.016,0.018,0.020,0.022])
 # ax.yaxis.set_major_formatter(mtick.FormatStrFormatter('%.1e'))
 plt.plot(x, y1, marker='s', clip_on=False, label='Baseline model') 
 plt.plot(x, y2, marker='o', clip_on=False,label='Proposed model') 
@@ -166,8 +166,8 @@ print(1,sum(q)/5)
 
 #variant: F
 x = [80, 90, 100, 110, 120]
-y1 = [0.019571763431755106, 0.020030179048672776, 0.02055638706548533, 0.020850540399078906, 0.021652756985563078]      # 曲线 y1
-y2 = [0.014928046132978164, 0.015558807597083703, 0.016145208369117085, 0.0169223145683277, 0.018403728122718375]    # 曲线 y2
+y1 = [0.0185457663425, 0.019114604017, 0.019665077232690186, 0.0201769428754, 0.0209509951974]      # 曲线 y1
+y2 = [0.0122915482034, 0.0131122548054, 0.014005265003568385, 0.0150721000711, 0.0165078963272]    # 曲线 y2
 fig2 = plt.figure()    # 定义一个图像窗口
 ax = fig2.add_subplot(111) 
 ax.set(title='', ylabel='Maximum unavailability',xlabel='Number of functions, '+ r'|F|', xlim=[80, 120],xticks=[80, 90, 100, 110, 120]) 
@@ -175,8 +175,8 @@ plt.ylabel(ylabel='Maximum unavailability', fontsize=16)
 plt.xlabel(xlabel='Number of functions, '+ r'$|F|$', fontsize=16)
 plt.tick_params(labelsize=16)
 
-ax.set_ylim(0.014,0.024)
-ax.set_yticks([0.014,0.016,0.018,0.02,0.022,0.024])
+ax.set_ylim(0.012,0.021)
+ax.set_yticks([0.012,0.014,0.016,0.018,0.020,0.022])
 # ax.yaxis.set_major_formatter(mtick.FormatStrFormatter('%.1e'))
 plt.plot(x, y1, marker='s', clip_on=False, label='Baseline model') 
 plt.plot(x, y2, marker='o', clip_on=False,label='Proposed model') 
@@ -200,8 +200,8 @@ print(1,sum(q)/5)
 
 #variant: S, number of backup servers
 x = [16, 18, 20, 22, 24]
-y1 = [0.0212142575831, 0.02051891728774914, 0.02055638706548533, 0.0203690161117, 0.0204160075465]      # 曲线 y1
-y2 = [0.0178790306508, 0.016554155117337502, 0.016145208369117085, 0.0161170635111, 0.0162355979096]     # 曲线 y2
+y1 = [0.021844459772844074, 0.0201234171985, 0.019665077232690186, 0.019687300302751655, 0.01949377992449695]      # 曲线 y1
+y2 = [0.01807094437587707, 0.0155505499058, 0.014005265003568385, 0.013444385795921698, 0.0129479049910944]     # 曲线 y2
 fig1 = plt.figure()    # 
 ax = fig1.add_subplot(111) 
 ax.set(title='', ylabel='Maximum unavailability',xlabel='Number of backup servers, |S|',xlim=[16,24],xticks=[16,18,20,22,24]) 
@@ -209,8 +209,8 @@ plt.ylabel(ylabel='Maximum unavailability', fontsize=16)
 plt.xlabel(xlabel='Number of backup servers, '+r'$|S|$', fontsize=16)
 plt.tick_params(labelsize=16)
 
-ax.set_ylim(0.016,0.022)
-ax.set_yticks([0.016,0.017,0.018,0.019,0.02,0.021,0.022])
+ax.set_ylim(0.012,0.022)
+ax.set_yticks([0.012,0.014,0.016,0.018,0.020,0.022])
 
 # ax.yaxis.set_major_formatter(mtick.FormatStrFormatter('%.1E'))
 plt.plot(x, y1, marker='s', clip_on=False, label='Baseline model') # draw y1

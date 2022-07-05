@@ -2,6 +2,7 @@ from encodings import utf_8
 import sa_h_1_workload
 import time
 import io
+import datetime
 
 t0 = time.clock()
 trails=500
@@ -18,6 +19,10 @@ for i in range(trails):
     print(result[0],result[1],result[2])
     print("runtime for this trial:",time.clock()-t1)
 
+    print("current time:",datetime.datetime.now())
+
+
+
 reduced_una_ave=sum(reduced_una)/trails
 max_una_bs_ave=sum(max_una_bs)/trails
 max_una_wl_ave=sum(max_una_wl)/trails
@@ -33,7 +38,7 @@ print(max_una_wl_ave)
 
 
 with io.open('result.txt','a', encoding='utf_8') as f:
-    f.write('M=16'.decode('utf8')+'\n')  # change it every time after changing the reletive value for collecting data
+    f.write('S = 16'.decode('utf8')+'\n')  # change it every time after changing the reletive value for collecting data
     f.write(str(reduced_una_ave).decode('utf8')+'\n')
     f.write(str(max_una_bs_ave).decode('utf8')+'\n')
     f.write(str(max_una_wl_ave).decode('utf8')+'\n')

@@ -8,85 +8,13 @@ import string
 import time
 import numpy as np
 
-# def sa_wl(F, S, c_j, r_j, lambdas, mu, delta_j, costf_wl, T_i, T_t, cool):
-#     allocation = []
-#     for j in range(S):
-#         allocation.append(0)  
 
-#     #randomly allocate the backup server to each function in F as the initial allocation
-#     for i in range(F):
-#         flag = 1
-#         while(flag):
-#             j = random.randint(0,S-1)
-#             if c_j[j] - allocation[j] > 0:
-#                 allocation[j] = allocation[j] + 1
-#                 flag = 0
-    
-#     J_j = []     #J_j[]: the unavailabilities for all servers/components       
-#     J = 0
-#     #iterate servers, get the unavailability of the component j in the current allocation
-#     for j in range(S):
-#         J_jj = costf_wl(c_j[j], r_j[j], lambdas, mu, delta_j[j], allocation[j])
-#         J_j.append(J_jj)
-#         if J_jj > J:
-#             J = J_jj
-    
-#     #J is assumed to be the (minimized) maximum unavailability of the current allocation
-#     results = [J, allocation] 
-#     #print(results)
-        
-#     T = T_i  # initial temp
-    
-#     while T > T_t:
-#         T = cool*T       #temperature reduction
-        
-#         allocation1 = []  # a new allocation
-#         for j in range(S):
-#             allocation1.append(allocation[j])    #deep copy allocation to allocation1
-            
-#         flag = 1
-#         while(flag):
-#             # randomly select 2 servers
-#             j1 = random.randint(0,S-1)
-#             j2 = random.randint(0,S-1)
-
-#             # Assign a function protected by j1 to j2 to randomly move
-#             if j1 != j2 and allocation1[j1] > 0 and allocation1[j2] < c_j[j2]:   
-#                 allocation1[j1] = allocation1[j1] - 1
-#                 allocation1[j2] = allocation1[j2] + 1
-#                 flag = 0
-                
-#         J_j1 = J_j[:]  #J_j1[]: new unavailabilities for all servers/components for the changed allocation
-#         #update the unavailabilities of j1 and j2
-#         J_j1[j1] = costf_wl(c_j[j1], r_j[j1], lambdas, mu, delta_j[j1], allocation1[j1]) #
-#         J_j1[j2] = costf_wl(c_j[j2], r_j[j2], lambdas, mu, delta_j[j2], allocation1[j2]) #
-        
-#         J1 = 0
-#         #set J1 to the maximum unavailability in the new allocation J_j1
-#         for j in range(S):
-#             if J_j1[j] > J1:
-#                 J1 = J_j1[j]
-
-#         #J is the previous maximum unavailability, 
-#         #if new value J1 is better(lower then J), accept J1
-#         #or if new J1 is worse, accept it with a probability.
-#         if (J1 < J or random.random() < pow(math.e, -(J1 - J)/T)):
-#             allocation = allocation1[:]
-#             J = J1
-#             J_j = J_j1[:]
-            
-#                 #print T,ea
-#             results[0] = J
-#             results[1] = allocation
-#             #print(results)
-    
-#     return results
 def sa(F, S, c_j, r_j, lambdas, mu, delta_j, costf, T_i, T_t, cool):
     allocation = []
     for j in range(S):
         allocation.append(0)  
 
-    #randomly allocate the backup server to each function in F as the initial allocation
+    #　randomly allocate the backup server to each function in F as the initial allocation
     for i in range(F):
         flag = 1
         while(flag):
@@ -110,11 +38,11 @@ def sa(F, S, c_j, r_j, lambdas, mu, delta_j, costf, T_i, T_t, cool):
         
     T = T_i  # initial temp
     
-    #numberOfIterations=0
+    # numberOfIterations=0
     while T > T_t:
         #numberOfIterations=numberOfIterations+1
         T = cool*T       #temperature reduction
-        
+        print("temp:",T)
         allocation1 = []  # a new allocation
         for j in range(S):
             allocation1.append(allocation[j])    #deep copy allocation to allocation1
@@ -158,7 +86,7 @@ def sa(F, S, c_j, r_j, lambdas, mu, delta_j, costf, T_i, T_t, cool):
     return results
             
 def costf_bs(c_jj, r_jj, lambdas, mu, delta_jj, L_jj):
-    #numbner of fesible states
+    # numbner of fesible states
     if L_jj >= r_jj:
         num_feast = (r_jj*r_jj + r_jj) / 2 + (r_jj + 1)*(L_jj - r_jj + 1) + L_jj + 1
     else:
@@ -575,7 +503,7 @@ def lambda_wl(omega):
 def main(capacity_range): # change it in trials.py; default : 16
 #    costf(5, 3, 1 / 100, 1 / 10, 1 / 0.01, 2)
     F = 100  # change it; default:100
-    S = 20   # change it; default:20
+    S = 16   # change it; default:20
     
 
     lambdas = 1 / 10000  # change it; default:1 / 10000
@@ -602,12 +530,6 @@ def main(capacity_range): # change it in trials.py; default : 16
         if sum(c_j) >= F: #  insure total protecion capacity >= number of functions
             break
 
-    #print(delta_j)
-    # if sum(c_j) < F:
-    #     J = (1/mu) / (1/mu + 1/lambdas)    # ? unavailability / failure probability(1-survivability)
-    #     return 0,0,0
-    # elif sum(c_j) == F:   #
-    #     print("=====")      
 
     T_i = 10000000.0    #D_init
     T_t = 0.00001       #D_term
