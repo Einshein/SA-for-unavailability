@@ -1,0 +1,8 @@
+average maximum unavailability of workload-dependent model:
+0.01454723718168868
+average maximum unavailability of the model that use PB:
+0.020247911266393446
+average computation time of workload-dependent model:
+89.4184787
+average computation time of the model that use PB:
+17.6480108

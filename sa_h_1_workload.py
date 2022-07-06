@@ -485,6 +485,22 @@ def costf_wl(c_jj, r_jj, lambdas, mu, delta_jj, L_jj): #L_jj: number of function
     
     return Q_jj
 
+# return the bound of the  
+def costf_bound(c_jj, r_jj, lambdas, mu, delta_jj, L_jj): # L_jj: number of functions which are protected by server j
+    a = lambdas/(lambdas+mu)
+    b = delta_jj/(lambdas + lambda_wl(1))    # assume that the workload of backup server is 1
+    c = mu + delta_jj + lambda_wl(1)
+
+    if L_jj <= r_jj: # case 3
+        Q_U = a-b*((a*mu)/(c+(1+b)*mu))
+    else: # case 4
+        z_L = min((r_jj*mu)/(L_jj-r_jj),(mu*r_jj)/L_jj)             # z_i^L
+        Q_U = a-b*((a*z_L)/(c+(1+b)*z_L))
+    
+    return Q_U
+
+
+
 
 # def solve(F, S, c_j, r_j, lambdas, mu, delta_j, T_i, T_t, cool):
 #     J = sa(F, S, c_j, r_j, lambdas, mu, delta_j, costf_bs, T_i, T_t, cool)[0]
@@ -505,7 +521,6 @@ def main(capacity_range): # change it in trials.py; default : 16
     F = 100  # change it; default:100
     S = 16   # change it; default:20
     
-
     lambdas = 1 / 10000  # change it; default:1 / 10000
     mu = 1 / 1000  # change it; default:1 / 1000
     #print((1/mu) / (1/mu + 1/lambdas))   #
@@ -535,31 +550,33 @@ def main(capacity_range): # change it in trials.py; default : 16
     T_t = 0.00001       #D_term
     cool = 0.998  #default:0.99
     # the optimal allocation J_ST under the static scenario
-    J_ST = sa(F, S, c_j, r_j, lambdas, mu, delta_j, costf_bs, T_i, T_t, cool) 
+    # J_ST = sa(F, S, c_j, r_j, lambdas, mu, delta_j, costf_bs, T_i, T_t, cool) 
     # print("The optimal allocation J_ST and its maximum unavailability under the static scenario:")
     # print(J_ST)
 
     # the optimal allocation J_WL under the workload-dependent scenario
     # print("The optimal allocation J_WL and its maximum unavailability under the workload-dependent scenario:")
+    t0=time.clock()
     J_WL = sa(F, S, c_j, r_j, lambdas, mu, delta_j, costf_wl, T_i, T_t, cool)
+    t1=time.clock()-t0
+    #print(t1)
     # print(J_WL)
 
-    # Verify the maximum unavailability of the allocation J_ST under the workload-dependent scenario
-    Q=0 #maximum unavailability
+    t0=time.clock()
+    J_Bound = sa(F, S, c_j, r_j, lambdas, mu, delta_j, costf_bound, T_i, T_t, cool)
+    # compute the real maximum unavailability
+    Q_Bound=0 #maximum unavailability
     for j in range(S):
-        q = costf_wl(c_j[j], r_j[j], lambdas, mu, delta_j[j], J_ST[1][j])
-        if q > Q:
-            Q = q
+        q = costf_wl(c_j[j], r_j[j], lambdas, mu, delta_j[j], J_Bound[1][j])
+        if q > Q_Bound:
+            Q_Bound = q
 
-    # print("The maximum unavailability of the allocation J_ST under the workload-dependent scenario:")
-    # print(Q)
 
-    # reduce how many percent maximum unavailability compared to the baseline model
-    # print("How much has the maximum unavailability decreased compare to the baseline model")
-    adv=(Q-J_WL[0])/Q
-    # print(adv)
-    # return adv,Q,J_WL[0]
-    return adv,Q,J_WL[0]
+
+    t2=time.clock()-t0
+    #print(t2)
+    
+    return J_WL[0], Q_Bound, t1, t2
 
         
 
