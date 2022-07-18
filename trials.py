@@ -13,7 +13,7 @@ com_time_bound=[]
 for i in range(trails):
     print('trial_number', i)
     t1=time.clock()
-    result=sa_h_1_workload.main(16) # main(capacity_range,lambdas)
+    result=sa_h_1_workload.main(16) # main(capacity_range)
     max_una_wl.append(result[0])
     max_una_bound.append(result[1])
     com_time_wl.append(result[2])
@@ -44,7 +44,9 @@ print(com_time_bound_ave)
 
 
 with io.open('result_mixedSA.txt','a', encoding='utf_8') as f:
-    #f.write('S = 16'.decode('utf8')+'\n')  # change it every time after changing the reletive value for collecting data
+    f.write("***********************".decode('utf8')+'\n')
+    f.write(time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())).decode('utf8')+'\n')
+    f.write("trails number:".decode('utf8')+str(trails).decode('utf8')+'\n')
     f.write("result:".decode('utf8')+'\n')
     f.write(str(max_una_wl_ave).decode('utf8')+'\n')
     f.write(str(max_una_bound_ave).decode('utf8')+'\n')
