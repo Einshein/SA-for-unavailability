@@ -9,7 +9,7 @@ import time
 import numpy as np
 
 
-def sa(F, S, c_j, r_j, lambdas, mu, delta_j,costf, T_i, T_t, cool):  # c_j, r_j, delta_j : list
+def sa(F, S, c_j, r_j, lambdas, mu, delta_j, T_i, T_t, cool):  # c_j, r_j, delta_j : list
     allocation = []
     for j in range(S):
         allocation.append(0)  
@@ -23,23 +23,27 @@ def sa(F, S, c_j, r_j, lambdas, mu, delta_j,costf, T_i, T_t, cool):  # c_j, r_j,
                 allocation[j] = allocation[j] + 1
                 flag = 0
     
-    J_j = []     #J_j[]: the unavailabilities for all servers/components       
-    J = 0
+    P_j = []     #p_j[]: the PB for all servers/components       
+    P = 0
     #iterate servers, get the unavailability of the component j in the current allocation
     for j in range(S):
-        J_jj = costf(c_j[j], r_j[j], lambdas, mu, delta_j[j], allocation[j])
-        J_j.append(J_jj)
-        if J_jj > J:
-            J = J_jj
+        P_jj = costf_pb(c_j[j], r_j[j], lambdas, mu, delta_j[j], allocation[j])
+        P_j.append(P_jj)
+        if P_jj > P:
+            P = P_jj
+    #   
     
-    #J is assumed to be the (minimized) maximum unavailability of the current allocation
-    results = [J, allocation] 
+    # P is assumed to be the (minimized) maximum PB of the current allocation
+    results = [P, allocation] 
     #print(results)
-        
-    T = T_i  # initial temp
-    
-    # numberOfIterations=0
+    ###############################
+
+    T = T_i  # initial temp  
+    # numberOfIterations=13802
+    itr=0
     while T > T_t:
+        itr=itr+1
+
         #numberOfIterations=numberOfIterations+1
         T = cool*T       #temperature reduction
         print("temp:",T)
@@ -59,28 +63,84 @@ def sa(F, S, c_j, r_j, lambdas, mu, delta_j,costf, T_i, T_t, cool):  # c_j, r_j,
                 allocation1[j2] = allocation1[j2] + 1
                 flag = 0
                 
-        J_j1 = J_j[:]  #J_j1[]: new unavailabilities for all servers/components for the changed allocation
-        #update the unavailabilities of j1 and j2
-        J_j1[j1] = costf(c_j[j1], r_j[j1], lambdas, mu, delta_j[j1], allocation1[j1]) #
-        J_j1[j2] = costf(c_j[j2], r_j[j2], lambdas, mu, delta_j[j2], allocation1[j2]) #
-        
-        J1 = 0
-        #set J1 to the maximum unavailability in the new allocation J_j1
-        for j in range(S):
-            if J_j1[j] > J1:
-                J1 = J_j1[j]
+        #############################
+        switch=int(13802*0.5)  #default: 0.5 
+        if itr < switch:
+            P_j1 = P_j[:]  #P_j1[]: new unavailabilities for all servers/components for the changed allocation
+            #update the unavailabilities of j1 and j2
+            P_j1[j1] = costf_pb(c_j[j1], r_j[j1], lambdas, mu, delta_j[j1], allocation1[j1]) #
+            P_j1[j2] = costf_pb(c_j[j2], r_j[j2], lambdas, mu, delta_j[j2], allocation1[j2]) #
 
-        #J is the previous maximum unavailability, 
-        #if new value J1 is better(lower then J), accept J1
-        #or if new J1 is worse, accept it with a probability.
-        if (J1 < J or random.random() < pow(math.e, -(J1 - J)/T)):
-            allocation = allocation1[:]
-            J = J1
-            J_j = J_j1[:]
+            P1 = 0
+            #set P1 to the maximum unavailability in the new P_j1[]
+            for j in range(S):
+                if P_j1[j] > P1:
+                    P1 = P_j1[j]
+
+            #P is the previous maximum unavailability, 
+            #if new value J1 is better(lower then J), accept J1
+            #or if new J1 is worse, accept it with a probability.
+            if (P1 < P or random.random() < pow(math.e, -(P1 - P)/T)):
+                allocation = allocation1[:]
+                P = P1
+                P_j = P_j1[:]
+                
+                results[0] = P
+                results[1] = allocation
             
-                #print T,ea
-            results[0] = J
-            results[1] = allocation
+        if itr == switch:
+            # compute both J and P
+            # P:
+            P_j1 = P_j[:]  #P_j1[]: new unavailabilities for all servers/components for the changed allocation
+            #update the unavailabilities of j1 and j2
+            P_j1[j1] = costf_pb(c_j[j1], r_j[j1], lambdas, mu, delta_j[j1], allocation1[j1]) #
+            P_j1[j2] = costf_pb(c_j[j2], r_j[j2], lambdas, mu, delta_j[j2], allocation1[j2]) #
+
+            P1 = 0
+            #set P1 to the maximum unavailability in the new P_j1[]
+            for j in range(S):
+                if P_j1[j] > P1:
+                    P1 = P_j1[j]
+
+            # J (initial):
+            J_j = []     #J_j[]: the unavailabilities for all servers/components       
+            J = 0
+            #iterate servers, get the unavailability of the component j in the current allocation
+            for j in range(S):
+                J_jj = costf_wl(c_j[j], r_j[j], lambdas, mu, delta_j[j], allocation[j])
+                J_j.append(J_jj)
+                if J_jj > J:
+                    J = J_jj
+            # comparison: P
+            # set initial J
+
+            if (P1 < P or random.random() < pow(math.e, -(P1 - P)/T)):
+                allocation = allocation1[:]
+
+                results[0] = J
+                results[1] = allocation
+
+        if itr > switch:
+            J_j1 = J_j[:]  #J_j1[]: new unavailabilities for all servers/components for the changed allocation
+            #update the unavailabilities of j1 and j2
+            J_j1[j1] = costf_wl(c_j[j1], r_j[j1], lambdas, mu, delta_j[j1], allocation1[j1]) #
+            J_j1[j2] = costf_wl(c_j[j2], r_j[j2], lambdas, mu, delta_j[j2], allocation1[j2]) #
+            
+            J1 = 0
+            #set J1 to the maximum unavailability in the new allocation J_j1
+            for j in range(S):
+                if J_j1[j] > J1:
+                    J1 = J_j1[j]
+
+            #J is the previous maximum unavailability, 
+            #if new value J1 is better(lower then J), accept J1
+            #or if new J1 is worse, accept it with a probability.
+            if (J1 < J or random.random() < pow(math.e, -(J1 - J)/T)):
+                allocation = allocation1[:]
+                J = J1
+                J_j = J_j1[:]
+                results[0] = J
+                results[1] = allocation
             #print(results)
     #print("numberOfIterations:",numberOfIterations)
     return results
@@ -349,32 +409,19 @@ def main(capacity_range): # change it in trials.py; default : 16
         if sum(c_j) >= F: #  insure total protecion capacity >= number of functions (shared)
             break
 
-
     T_i = 10000000.0    #D_init
     T_t = 0.00001       #D_term
     cool = 0.998  #default:0.99
 
-
     # the optimal allocation J_WL under the workload-dependent scenario
     # print("The optimal allocation J_WL and its maximum unavailability under the workload-dependent scenario:")
+
     t0=time.clock()
-    J_WL = sa(F, S, c_j, r_j, lambdas, mu, delta_j, costf_wl, T_i, T_t, cool)
+    J_mix = sa(F, S, c_j, r_j, lambdas, mu, delta_j, T_i, T_t, cool)
     t1=time.clock()-t0
-
-
-    t0=time.clock()
-    J_Bound = sa(F, S, c_j, r_j, lambdas, mu, delta_j, costf_pb, T_i, T_t, cool)
-    # compute the real maximum unavailability
-    Q_Bound=0 #maximum unavailability
-    for j in range(S):
-        q = costf_wl(c_j[j], r_j[j], lambdas, mu, delta_j[j], J_Bound[1][j])
-        if q > Q_Bound:
-            Q_Bound = q
-
-    t2=time.clock()-t0
     #print(t2)
-    
-    return J_WL[0], Q_Bound, t1, t2
+
+    return J_mix[0], t1
 
         
 
