@@ -4,7 +4,7 @@ import time
 import io
 import datetime
 t0 = time.clock()
-trails=500
+trails=1
 max_una=[]
 com_time=[]
 
@@ -32,9 +32,9 @@ print("average computation time:")
 print(com_time_ave)
 
 
-with io.open('result_mixedSA.txt','a', encoding='utf_8') as f:
+with io.open('result_mixedSA_refined.txt','a', encoding='utf_8') as f:
     f.write("***********************".decode('utf8')+'\n')
-    f.write("pb:0.5".decode('utf8')+'\n')
+    f.write("hybrid stage:0.05".decode('utf8')+'\n')
     f.write(time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())).decode('utf8')+'\n')
     f.write("trails number:".decode('utf8')+str(trails).decode('utf8')+'\n')
     f.write("result:".decode('utf8')+'\n')

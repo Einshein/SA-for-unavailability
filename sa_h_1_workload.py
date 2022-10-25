@@ -1,13 +1,13 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-#
+
 from __future__ import division
 import random
 import math
 import string
 import time
 import numpy as np
-
+import sys
 
 def sa(F, S, c_j, r_j, lambdas, mu, delta_j, T_i, T_t, cool):  # c_j, r_j, delta_j : list
     allocation = []
@@ -23,14 +23,22 @@ def sa(F, S, c_j, r_j, lambdas, mu, delta_j, T_i, T_t, cool):  # c_j, r_j, delta
                 allocation[j] = allocation[j] + 1
                 flag = 0
     
-    P_j = []     #p_j[]: the PB for all servers/components       
-    P = 0
-    #iterate servers, get the unavailability of the component j in the current allocation
+    P_j = []     # P_j[]: the PBs for all servers/components       
+    P = 0        # maximum PB in the last accepted allocation
+
+    J_j = []    # J_j[]: the EUs for all servers/components 
+    J = 0     # maximum EU in the last accepted allocation
+    # iterate servers, get PB of the component j (P_jj) in the current allocation
     for j in range(S):
         P_jj = costf_pb(c_j[j], r_j[j], lambdas, mu, delta_j[j], allocation[j])
         P_j.append(P_jj)
         if P_jj > P:
             P = P_jj
+
+        # set eu to 100, which means that eu is not allowed to compute
+        # (1000 means that eu is allowed to compute but didnt be computed)
+        J_j = [100]*S
+        J = 100
     #   
     
     # P is assumed to be the (minimized) maximum PB of the current allocation
@@ -41,6 +49,13 @@ def sa(F, S, c_j, r_j, lambdas, mu, delta_j, T_i, T_t, cool):  # c_j, r_j, delta
     T = T_i  # initial temp  
     # numberOfIterations=13802
     itr=0
+    # 0.0-0.9, 0.9-0.95, 0.95-1.0
+    switch=int(13802*0.9)  # int(13802*0.9) == 12421
+    switch2=int(13802*0.99) # int(13802*0.95) == 13111
+
+    # if (switch2-switch)%2==1:
+    #     switch2=switch2+1
+
     while T > T_t:
         itr=itr+1
 
@@ -64,85 +79,185 @@ def sa(F, S, c_j, r_j, lambdas, mu, delta_j, T_i, T_t, cool):  # c_j, r_j, delta
                 flag = 0
                 
         #############################
-        switch=int(13802*0.5)  #default: 0.5 
         if itr < switch:
-            P_j1 = P_j[:]  #P_j1[]: new unavailabilities for all servers/components for the changed allocation
-            #update the unavailabilities of j1 and j2
+            P_j1 = P_j[:]  #P_j1[]: new pb for all servers/components for the changed allocation
+            #update the pb of j1 and j2
             P_j1[j1] = costf_pb(c_j[j1], r_j[j1], lambdas, mu, delta_j[j1], allocation1[j1]) #
             P_j1[j2] = costf_pb(c_j[j2], r_j[j2], lambdas, mu, delta_j[j2], allocation1[j2]) #
 
             P1 = 0
-            #set P1 to the maximum unavailability in the new P_j1[]
+            #set P1 to the maximum PB in the new P_j1[]
             for j in range(S):
                 if P_j1[j] > P1:
                     P1 = P_j1[j]
 
-            #P is the previous maximum unavailability, 
-            #if new value J1 is better(lower then J), accept J1
-            #or if new J1 is worse, accept it with a probability.
+            #P is the previous performence bound, 
+            #if allocation1 is better(lower PB), accept allocation1
+            #or if allocation1 is worse, accept it with a probability.
             if (P1 < P or random.random() < pow(math.e, -(P1 - P)/T)):
                 allocation = allocation1[:]
                 P = P1
                 P_j = P_j1[:]
                 
-                results[0] = P
-                results[1] = allocation
+                # results[0] = P
+                # results[1] = allocation
             
-        if itr == switch:
-            # compute both J and P
-            # P:
-            P_j1 = P_j[:]  #P_j1[]: new unavailabilities for all servers/components for the changed allocation
-            #update the unavailabilities of j1 and j2
-            P_j1[j1] = costf_pb(c_j[j1], r_j[j1], lambdas, mu, delta_j[j1], allocation1[j1]) #
-            P_j1[j2] = costf_pb(c_j[j2], r_j[j2], lambdas, mu, delta_j[j2], allocation1[j2]) #
+        if itr >= switch and itr < switch2:
+            if(itr-switch)%2==0 : # only P
+                # compute  P
+                # P:
+                P_j1 = P_j[:]  #P_j1[]: new unavailabilities for all servers/components for the changed allocation
+                #update the unavailabilities of j1 and j2
+                P_j1[j1] = costf_pb(c_j[j1], r_j[j1], lambdas, mu, delta_j[j1], allocation1[j1]) #
+                P_j1[j2] = costf_pb(c_j[j2], r_j[j2], lambdas, mu, delta_j[j2], allocation1[j2]) #
 
-            P1 = 0
-            #set P1 to the maximum unavailability in the new P_j1[]
-            for j in range(S):
-                if P_j1[j] > P1:
-                    P1 = P_j1[j]
+                P1 = 0
+                #set P1 to the maximum unavailability in the new P_j1[]
+                for j in range(S):
+                    if P_j1[j] > P1:
+                        P1 = P_j1[j]
 
-            # J (initial):
-            J_j = []     #J_j[]: the unavailabilities for all servers/components       
-            J = 0
-            #iterate servers, get the unavailability of the component j in the current allocation
-            for j in range(S):
-                J_jj = costf_wl(c_j[j], r_j[j], lambdas, mu, delta_j[j], allocation[j])
-                J_j.append(J_jj)
-                if J_jj > J:
-                    J = J_jj
-            # comparison: P
-            # set initial J
+                if (P1 < P or random.random() < pow(math.e, -(P1 - P)/T)):
+                    allocation = allocation1[:]
+                    P = P1
+                    P_j = P_j1[:]
+                    # no eu, set eu to 100 to tag this assignment only has PB
+                    J = 100
+                    J_j = [100]*S
+                    # results[0] = J
+                    # results[1] = allocation
+            else: # P and E
+                # compute both J and P
+                # J 
+                # check if last accepted assignment has eu
 
-            if (P1 < P or random.random() < pow(math.e, -(P1 - P)/T)):
-                allocation = allocation1[:]
+                if J == 100: # last accepted assignment has only PB, so compare PB, and compute EU, update or not pb and eu
+                    # P:
+                    P_j1 = P_j[:]  #P_j1[]: new unavailabilities for all servers/components for the changed allocation
+                    #update the unavailabilities of j1 and j2
+                    P_j1[j1] = costf_pb(c_j[j1], r_j[j1], lambdas, mu, delta_j[j1], allocation1[j1]) #
+                    P_j1[j2] = costf_pb(c_j[j2], r_j[j2], lambdas, mu, delta_j[j2], allocation1[j2]) #
+                    P1 = 0
+                    #set P1 to the maximum unavailability in the new P_j1[]
+                    for j in range(S):
+                        if P_j1[j] > P1:
+                            P1 = P_j1[j]
 
-                results[0] = J
-                results[1] = allocation
+                    # E:
+                    # temp J_j1, if accepted , J_j=J_j1, J=J1     
+                    J1=0
+                    J_j1=[]  
+                    for j in range(S):
+                        J_jj = costf_wl(c_j[j], r_j[j], lambdas, mu, delta_j[j], allocation[j])
+                        J_j1.append(J_jj)
+                        if J_jj > J1:
+                            J1 = J_jj
+                    
+                    # judge
+                    if (P1 < P or random.random() < pow(math.e, -(P1 - P)/T)):
+                        allocation = allocation1[:]
+                        P = P1
+                        P_j = P_j1[:]  
+                        J = J1
+                        J_j = J_j1[:]  
+                        
 
-        if itr > switch:
-            J_j1 = J_j[:]  #J_j1[]: new unavailabilities for all servers/components for the changed allocation
-            #update the unavailabilities of j1 and j2
-            J_j1[j1] = costf_wl(c_j[j1], r_j[j1], lambdas, mu, delta_j[j1], allocation1[j1]) #
-            J_j1[j2] = costf_wl(c_j[j2], r_j[j2], lambdas, mu, delta_j[j2], allocation1[j2]) #
-            
-            J1 = 0
-            #set J1 to the maximum unavailability in the new allocation J_j1
-            for j in range(S):
-                if J_j1[j] > J1:
-                    J1 = J_j1[j]
+                #if J==1000:
+                else: # last accepted assignment has EU
+                    # EU
+                    J_j1 = J_j[:]
+                    J_j1[j1] = costf_wl(c_j[j1], r_j[j1], lambdas, mu, delta_j[j1], allocation1[j1]) #
+                    J_j1[j2] = costf_wl(c_j[j2], r_j[j2], lambdas, mu, delta_j[j2], allocation1[j2]) #
+                    J1=0
+                    for j in range(S):
+                        if J_j1[j] > J1:
+                            J1 = J_j1[j]
+                    
+                    # PB
+                    P_j1 = P_j[:]  #P_j1[]: new unavailabilities for all servers/components for the changed allocation
+                    #update the unavailabilities of j1 and j2
+                    P_j1[j1] = costf_pb(c_j[j1], r_j[j1], lambdas, mu, delta_j[j1], allocation1[j1]) #
+                    P_j1[j2] = costf_pb(c_j[j2], r_j[j2], lambdas, mu, delta_j[j2], allocation1[j2]) #
+                    P1 = 0
+                    #set P1 to the maximum unavailability in the new P_j1[]
+                    for j in range(S):
+                        if P_j1[j] > P1:
+                            P1 = P_j1[j]
 
-            #J is the previous maximum unavailability, 
-            #if new value J1 is better(lower then J), accept J1
-            #or if new J1 is worse, accept it with a probability.
-            if (J1 < J or random.random() < pow(math.e, -(J1 - J)/T)):
-                allocation = allocation1[:]
-                J = J1
-                J_j = J_j1[:]
-                results[0] = J
-                results[1] = allocation
-            #print(results)
+                    # judge
+                    if (J1 < J or random.random() < pow(math.e, -(J1 - J)/T)):
+                        allocation = allocation1[:]
+                        P = P1
+                        P_j = P_j1[:]  
+                        J = J1
+                        J_j = J_j1[:]  
+
+
+        if itr >= switch2: 
+            if J == 100: # last accepted assignment has only PB, so compare PB, and compute EU, update or not pb and eu
+                # P:
+                P_j1 = P_j[:]  #P_j1[]: new unavailabilities for all servers/components for the changed allocation
+                #update the unavailabilities of j1 and j2
+                P_j1[j1] = costf_pb(c_j[j1], r_j[j1], lambdas, mu, delta_j[j1], allocation1[j1]) #
+                P_j1[j2] = costf_pb(c_j[j2], r_j[j2], lambdas, mu, delta_j[j2], allocation1[j2]) #
+                P1 = 0
+                #set P1 to the maximum unavailability in the new P_j1[]
+                for j in range(S):
+                    if P_j1[j] > P1:
+                        P1 = P_j1[j]
+
+                # E:
+                # temp J_j1, if accepted , J_j=J_j1, J=J1     
+                J1=0  
+                J_j1=[]  
+                for j in range(S):
+                    J_jj = costf_wl(c_j[j], r_j[j], lambdas, mu, delta_j[j], allocation[j])
+                    J_j1.append(J_jj)
+                    if J_jj > J1:
+                        J1 = J_jj
+                
+                # judge
+                if (P1 < P or random.random() < pow(math.e, -(P1 - P)/T)):
+                    allocation = allocation1[:]
+                    P = P1
+                    P_j = P_j1[:]  
+                    J = J1
+                    J_j = J_j1[:]  
+                    
+
+            #if J==1000:
+            else: # last accepted assignment has EU
+                # EU
+                J_j1 = J_j[:]
+                J_j1[j1] = costf_wl(c_j[j1], r_j[j1], lambdas, mu, delta_j[j1], allocation1[j1]) #
+                J_j1[j2] = costf_wl(c_j[j2], r_j[j2], lambdas, mu, delta_j[j2], allocation1[j2]) #
+                J1=0
+                for j in range(S):
+                    if J_j1[j] > J1:
+                        J1 = J_j1[j]
+                
+                # PB
+                P_j1 = P_j[:]  #P_j1[]: new unavailabilities for all servers/components for the changed allocation
+                #update the unavailabilities of j1 and j2
+                P_j1[j1] = costf_pb(c_j[j1], r_j[j1], lambdas, mu, delta_j[j1], allocation1[j1]) #
+                P_j1[j2] = costf_pb(c_j[j2], r_j[j2], lambdas, mu, delta_j[j2], allocation1[j2]) #
+                P1 = 0
+                #set P1 to the maximum unavailability in the new P_j1[]
+                for j in range(S):
+                    if P_j1[j] > P1:
+                        P1 = P_j1[j]
+
+                # judge
+                if (J1 < J or random.random() < pow(math.e, -(J1 - J)/T)):
+                    allocation = allocation1[:]
+                    P = P1
+                    P_j = P_j1[:]  
+                    J = J1
+                    J_j = J_j1[:]  
+
     #print("numberOfIterations:",numberOfIterations)
+    results[0] = J
+    results[1] = allocation
     return results
             
 
