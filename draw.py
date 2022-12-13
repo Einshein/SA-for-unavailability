@@ -26,21 +26,75 @@ class MathTextSciFormatter(mtick.Formatter):
 
 
 
-x=['0.0\n(SA-EU)','0.5','0.6','0.7','0.8','0.9','0.95','0.96','0.97','0.98','0.99','1.0\n(SA-PB)']
-y1=[28.163934644,14.879518324,12.206499784,9.432058318,7.174580248,3.641886068,1.995819818,1.6236188,1.276133262,0.951333438,0.58341126,0.233341802]
-y2=[0.014279978994,0.0142765428713,0.0142227754638,0.0142814319377,0.0142569414516,0.0142505362645,0.014637721712,0.0147068204199,0.0152559482941,0.0157080629584,0.0167428277491,0.0210954541336]
-fig=plt.figure()
-ax1 = fig.add_subplot(111)
-ax1.bar(x,y1,color='lightgray',edgecolor = "black")
-plt.xticks(rotation = 0) # Rotates X-Axis Ticks by 45-degrees
+# x=['0.00','0.01', '0.02', '0.03', '0.04', '0.05', '0.06','0.07','0.08','0.09']
+# #full eu
+# y1=[0.014197685262137426, 0.014197685262137426, 0.014197685262137426, 0.014197685262137426, 0.014197685262137426, 0.014197685262137426, 0.014197685262137426, 0.014197685262137426, 0.014197685262137426, 0.014197685262137426]
+# #full pb
+# y2=[0.014197685262137426, 0.01417619030102387, 0.01429533125371889, 0.014152139115389244, 0.014242976191188634, 0.014550208315828804, 0.014790977100056193, 0.015097992369050352, 0.015769109755344346, 0.01691381645246325]
+# #hybrid
+# y3=[0.014197685262137426, 0.0140215295198, 0.0141593700212, 0.0141778580041, 0.0144610328487, 0.014457316396212078, 0.01467081004, 0.015038860796, 0.01580763988226292, 0.0167587229168]
+# fig=plt.figure()
+# ax1 = fig.add_subplot(111)
+# plt.xticks(rotation = 0) # Rotates X-Axis Ticks by 45-degrees
 
-ax1.legend(labels=['Computation time [s]'], bbox_to_anchor=(0, 1.08), loc='upper left', borderaxespad=0)
-ax2 = ax1.twinx()
-ax2.plot(x,y2,color='tab:blue',marker='o', clip_on=False,label='Maximum unavailability')
-ax1.set(title='', ylabel='Computation time [s]',xlabel='Ratio of the iterations using PB method to all iterations in SA-MIX, $\it{x}$',yticks=[0,5,10,15,20,25,30]) 
-ax2.set(title='', ylabel='Maximum unavailability',yticks=[0.014,0.015,0.016,0.017,0.018,0.019,0.020,0.021,0.022]) 
-plt.legend(labels=['Maximum unavailability'], bbox_to_anchor=(1, 1.08), loc='upper right', borderaxespad=0)
+# ax1.set(title='', ylabel='Maximum unavailability',xlabel='Ratio of the iterations using PB method to all iterations in SA-MIX, $\it{x}$', yticks=[0.014,0.015,0.016,0.017,0.018,0.019,0.020,0.021,0.022]) 
+# plt.show()
+
+
+x=['0.00','0.01', '0.02', '0.03', '0.04', '0.05', '0.06','0.07','0.08','0.09']
+#full eu
+y1=[0.014197685262137426, 0.014197685262137426, 0.014197685262137426, 0.014197685262137426, 0.014197685262137426, 0.014197685262137426, 0.014197685262137426, 0.014197685262137426, 0.014197685262137426, 0.014197685262137426]
+#full pb
+#y2=[0.014197685262137426, 0.01417619030102387, 0.01429533125371889, 0.014152139115389244, 0.014242976191188634, 0.014550208315828804, 0.014790977100056193, 0.015097992369050352, 0.015769109755344346, 0.01691381645246325]
+y2=[0.014197685262137426, 0.01417619030102387, 0.01429533125371889, 0.014152139115389244, 0.014633930846467054, 0.014550208315828804, 0.014790977100056193, 0.015097992369050352, 0.015769109755344346, 0.01691381645246325]
+
+#hybrid
+y3=[0.014197685262137426, 0.0140215295198, 0.0141593700212, 0.0141778580041, 0.0144610328487, 0.014457316396212078, 0.01467081004, 0.015038860796, 0.01580763988226292, 0.0167587229168]
+
+fig1 = plt.figure()    # 
+ax = fig1.add_subplot(111) 
+ax.set(title='', yticks=[0.014,0.015, 0.016, 0.017, 0.018, 0.019, 0.020, 0.021, 0.022], xlabel='Ratio of the second stage') 
+plt.ylabel(ylabel='Maximum unavailability', fontsize=16)
+plt.xlabel(xlabel='Ratio of the second stage', fontsize=16)
+plt.tick_params(labelsize=16)
+# ax.yaxis.set_major_formatter(mtick.FormatStrFormatter('%.1E'))
+plt.plot(x, y1, marker='s', clip_on=False, label='Full EU') # draw y1
+plt.plot(x, y2, marker='o', clip_on=False,label='Full PB') # draw y2
+plt.plot(x, y3, marker='p', clip_on=False,label='Hybrid') # draw y2
+
+plt.gca().yaxis.set_major_formatter(MathTextSciFormatter("%1.1e"))
+plt.legend(fontsize=14)
+#plt.show()
+
+##################################
+x=['0.00','0.01', '0.02', '0.03', '0.04', '0.05', '0.06','0.07','0.08','0.09']
+#full eu
+y1=[ 7.098285084, 7.098285084, 7.098285084, 7.098285084, 7.098285084, 7.098285084, 7.098285084, 7.098285084, 7.098285084, 7.098285084 ]
+#full pb
+#y2=[ 7.098285084, 6.471756154, 6.283840318, 5.057835962, 4.563889214, 3.674441746, 3.031066902, 2.37998858, 1.73343329, 1.036746862]
+y2=[ 7.098285084, 6.471756154, 6.283840318, 5.057835962, 4.490905700, 3.674441746, 3.031066902, 2.37998858, 1.73343329, 1.036746862]
+
+#hybrid
+y3=[ 7.098285084, 7.168200414, 6.890498386, 6.71077571, 6.636278552, 6.628835094, 6.44776276, 6.307170258, 6.295219626, 6.076585826]
+
+fig1 = plt.figure()    # 
+ax = fig1.add_subplot(111) 
+ax.set(title='', yticks=[1,2,3,4,5,6,7,8], xlabel='Ratio of the second stage') 
+plt.ylabel(ylabel='Computation time', fontsize=16)
+plt.xlabel(xlabel='Ratio of the second stage', fontsize=16)
+plt.tick_params(labelsize=16)
+# ax.yaxis.set_major_formatter(mtick.FormatStrFormatter('%.1E'))
+plt.plot(x, y1, marker='s', clip_on=False, label='Full EU') # draw y1
+plt.plot(x, y2, marker='o', clip_on=False,label='Full PB') # draw y2
+plt.plot(x, y3, marker='p', clip_on=False,label='Hybrid') # draw y2
+
+plt.gca().yaxis.set_major_formatter(MathTextSciFormatter("%1.1e"))
+plt.legend(fontsize=14)
 plt.show()
+
+
+
+
 
 
 

@@ -41,3 +41,9 @@ with io.open('result_mixedSA_refined.txt','a', encoding='utf_8') as f:
     f.write(str(max_una_ave).decode('utf8')+'\n')
     f.write(str(com_time_ave).decode('utf8')+'\n')
 
+
+
+
+
+
+
