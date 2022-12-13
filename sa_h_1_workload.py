@@ -61,6 +61,7 @@ def sa(F, S, c_j, r_j, lambdas, mu, delta_j, T_i, T_t, cool):  # c_j, r_j, delta
     lastEUAssignment=[]
     lastEUs = []
     #changedPosition = [] #compare new assignment with lastEUAssignment, see which connected components are changed.
+    EUchance=0       #if last accepted assignment can compute EU when comparing with the later assignment
 
     while T > T_t:
         itr=itr+1
@@ -126,6 +127,7 @@ def sa(F, S, c_j, r_j, lambdas, mu, delta_j, T_i, T_t, cool):  # c_j, r_j, delta
                         P1 = P_j1[j]
 
                 if (P1 < P or random.random() < pow(math.e, -(P1 - P)/T)):
+                    EUchance=0   #if accept, set EUchance=0(never gonna compute EU)
                     allocation = allocation1[:]
                     P = P1
                     P_j = P_j1[:]
@@ -134,7 +136,7 @@ def sa(F, S, c_j, r_j, lambdas, mu, delta_j, T_i, T_t, cool):  # c_j, r_j, delta
                     J_j = [100]*S
                     # results[0] = J
                     # results[1] = allocation
-            else: # P and E
+            else: # P and possible E
                 # compute both J and P
 
                 # P:
@@ -149,24 +151,70 @@ def sa(F, S, c_j, r_j, lambdas, mu, delta_j, T_i, T_t, cool):  # c_j, r_j, delta
                         P1 = P_j1[j]
 
 
-                # J 
-                # new EUs for new allocation1
-                J1=0
-                J_j1=[]  
-                if firstEU:
-                    # E:
-                    # temp J_j1, if accepted , J_j=J_j1, J=J1   \
-                    # 
-                    firstEU = False
+                # judge
+                if J == 100 and EUchance==0: # last assignment has no EU and no chance to compute EU
+                    if firstEU: # for first accepted iteration, compute EUs as the base anyway
+                        # new EUs for new allocation1
+                        # J_base=0
+                        J_j_base=[]   
+                        # E:
+                        # temp J_j1, if accepted , J_j=J_j1, J=J1   \
+                        # 
+                        firstEU = False
 
+                        for j in range(S):
+                            J_jj = costf_wl(c_j[j], r_j[j], lambdas, mu, delta_j[j], allocation1[j])
+                            J_j_base.append(J_jj)
+                            # if J_jj > J_base:
+                            #     J_base = J_jj
+                        lastEUs = J_j_base[:]
+                        lastEUAssignment = allocation1[:]
+
+                    if (P1 < P or random.random() < pow(math.e, -(P1 - P)/T)):
+                        EUchance=1    # showing that this last accepted assignment have the chance to compute EU 
+                        allocation = allocation1[:]
+                        P = P1
+                        P_j = P_j1[:]  
+
+                
+                elif J==100 and EUchance==1:  # last accepted assignment has no EU, now compute both EU
+                    
+                    # compute previous one first (last accepted assignment)
+                    J=0  # max EU
+                    J_j = lastEUs[:] 
                     for j in range(S):
-                        J_jj = costf_wl(c_j[j], r_j[j], lambdas, mu, delta_j[j], allocation1[j])
-                        J_j1.append(J_jj)
-                        if J_jj > J1:
-                            J1 = J_jj
-                    lastEUs = J_j1[:]
-                    lastEUAssignment = allocation1[:] 
-                else:
+                        if lastEUAssignment[j] != allocation[j]:
+                            J_j[j] = costf_wl(c_j[j], r_j[j], lambdas, mu, delta_j[j], allocation[j])
+                        if J_j[j] > J:
+                            J = J_j[j]
+
+                    # compute later one (current assignment)
+                    J1=0  # MAX EU
+                    J_j1=[]  
+                    J_j1 = lastEUs[:] 
+                    for j in range(S):
+                        if lastEUAssignment[j] != allocation1[j]:
+                            J_j1[j] = costf_wl(c_j[j], r_j[j], lambdas, mu, delta_j[j], allocation1[j])
+                        if J_j1[j] > J1:
+                            J1 = J_j1[j]
+
+                    if (J1 < J or random.random() < pow(math.e, -(J1 - J)/T)):
+                        allocation = allocation1[:]
+                        P = P1
+                        P_j = P_j1[:]  
+                        J = J1
+                        J_j = J_j1[:]  
+
+                    # update
+                    lastEUs = J_j[:]
+                    lastEUAssignment = allocation[:] 
+
+
+
+                elif J!=100:    #EUchance==1: last accepted assignment has EU            
+                    # if last assignment has EU, compute J 
+                    # new EUs for new allocation1
+                    J1=0
                     J_j1 = lastEUs[:] 
                     for j in range(S):
                         if lastEUAssignment[j] != allocation1[j]:
@@ -175,41 +223,33 @@ def sa(F, S, c_j, r_j, lambdas, mu, delta_j, T_i, T_t, cool):  # c_j, r_j, delta
                         if J_j1[j] > J1:
                             J1 = J_j1[j]
 
-                    lastEUs = J_j1[:]
-                    lastEUAssignment = allocation1[:] 
-
-                # judge
-                if J == 100: # last assignment has no EU
-                    if (P1 < P or random.random() < pow(math.e, -(P1 - P)/T)):
-                        allocation = allocation1[:]
-                        P = P1
-                        P_j = P_j1[:]  
-                        J = J1
-                        J_j = J_j1[:]  
-                else:
                     if (J1 < J or random.random() < pow(math.e, -(J1 - J)/T)):
                         allocation = allocation1[:]
                         P = P1
                         P_j = P_j1[:]  
                         J = J1
                         J_j = J_j1[:]  
+                    # update    
+                    lastEUs = J_j1[:]
+                    lastEUAssignment = allocation1[:] 
 
 
-        if itr >= switch2: 
-            if J == 100: # last accepted assignment has only PB, so compare PB, and compute EU, update or not pb and eu
-                # P:
-                P_j1 = P_j[:]  #P_j1[]: new unavailabilities for all servers/components for the changed allocation
-                #update the unavailabilities of j1 and j2
-                P_j1[j1] = costf_pb(c_j[j1], r_j[j1], lambdas, mu, delta_j[j1], allocation1[j1]) #
-                P_j1[j2] = costf_pb(c_j[j2], r_j[j2], lambdas, mu, delta_j[j2], allocation1[j2]) #
-                P1 = 0
-                #set P1 to the maximum unavailability in the new P_j1[]
+
+
+        if itr >= switch2: # full eu
+            if J == 100: # last accepted assignment has only PB, compute EU for last accepted assignment forcibly
+                # compute EU for last accepted assignment
+                J=0  # max EU
+                J_j = lastEUs[:] 
                 for j in range(S):
-                    if P_j1[j] > P1:
-                        P1 = P_j1[j]
+                    if lastEUAssignment[j] != allocation[j]:
+                        J_j[j] = costf_wl(c_j[j], r_j[j], lambdas, mu, delta_j[j], allocation[j])
+                    if J_j[j] > J:
+                        J = J_j[j]
 
                 # E:
-                # temp J_j1, if accepted , J_j=J_j1, J=J1     
+                # temp J_j1, if accepted , J_j=J_j1, J=J1                     
+
                 J1=0
                 J_j1=[]  
                 J_j1 = lastEUs[:] 
@@ -219,17 +259,16 @@ def sa(F, S, c_j, r_j, lambdas, mu, delta_j, T_i, T_t, cool):  # c_j, r_j, delta
 
                     if J_j1[j] > J1:
                         J1 = J_j1[j]
-                lastEUs = J_j1[:]
-                lastEUAssignment = allocation1[:] 
+
                 
                 # judge
-                if (P1 < P or random.random() < pow(math.e, -(P1 - P)/T)):
+                if (J1 < J or random.random() < pow(math.e, -(J1 - J)/T)):
                     allocation = allocation1[:]
-                    P = P1
-                    P_j = P_j1[:]  
                     J = J1
                     J_j = J_j1[:]  
-                    
+                
+                lastEUs = J_j1[:]
+                lastEUAssignment = allocation1[:] 
 
             #if J==1000:
             if J != 100: # last accepted assignment has EU
@@ -256,8 +295,6 @@ def sa(F, S, c_j, r_j, lambdas, mu, delta_j, T_i, T_t, cool):  # c_j, r_j, delta
                 # judge
                 if (J1 < J or random.random() < pow(math.e, -(J1 - J)/T)):
                     allocation = allocation1[:]
-                    # P = P1
-                    # P_j = P_j1[:]  
                     J = J1
                     J_j = J_j1[:]  
 
